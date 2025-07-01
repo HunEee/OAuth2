@@ -2,11 +2,13 @@ package com.spring_security.zAuthSession.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.spring_security.zAuthSession.oauth2.CustomClientRegistrationRepo;
+import com.spring_security.zAuthSession.oauth2.CustomOAuth2AuthorizedClientService;
 import com.spring_security.zAuthSession.service.CustomOAuth2UserService;
 
 @Configuration
@@ -16,10 +18,15 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     
 	private final CustomClientRegistrationRepo customClientRegistrationRepo;
+	
+    private final CustomOAuth2AuthorizedClientService customOAuth2AuthorizedClientService;
+    private final JdbcTemplate jdbcTemplate;
 
-	public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomClientRegistrationRepo customClientRegistrationRepo) {
-		this.customOAuth2UserService = customOAuth2UserService;
+    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomClientRegistrationRepo customClientRegistrationRepo, CustomOAuth2AuthorizedClientService customOAuth2AuthorizedClientService, JdbcTemplate jdbcTemplate) {
+        this.customOAuth2UserService = customOAuth2UserService;
         this.customClientRegistrationRepo = customClientRegistrationRepo;
+        this.customOAuth2AuthorizedClientService = customOAuth2AuthorizedClientService;
+        this.jdbcTemplate = jdbcTemplate;
     }
 	
    
@@ -40,6 +47,7 @@ public class SecurityConfig {
         http.oauth2Login(
         		(oauth2) -> oauth2.loginPage("/login")
         						  .clientRegistrationRepository(customClientRegistrationRepo.clientRegistrationRepository())
+        						  .authorizedClientService(customOAuth2AuthorizedClientService.oAuth2AuthorizedClientService(jdbcTemplate, customClientRegistrationRepo.clientRegistrationRepository()))
                 				  .userInfoEndpoint((userInfoEndpointConfig) ->
                 				  						userInfoEndpointConfig.userService(customOAuth2UserService))
 		);

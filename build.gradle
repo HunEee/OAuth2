@@ -40,6 +40,8 @@ dependencies {
     implementation 'javax.servlet:jstl:1.2'
     
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 }
 
 tasks.named('test') {
